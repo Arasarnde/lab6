@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Update</title>
+</head>
+
+<body style="text-align:center;" id="body">
+    <p id="form">
+        <input type="text" id="id" placeholder="id">
+        <button onclick="openJSON()">Find an Element</button>
+        <input type="text" id="name" placeholder="name">
+        <input type="number" id="cost" placeholder="cost">
+        <input type="text" id="img" placeholder="img">
+        <button onclick="updateJSON()">Update an Element</button>
+    </p>
+  
+    <script>
+        var data;
+        var id;
+
+        function openJSON() {
+            id = document.querySelector('#id');
+            let xhr = new XMLHttpRequest(); 
+            xhr.open("POST", "data.json", true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.send();
+            xhr.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    data = JSON.parse(this.responseText).map(Object.values);
+                }
+            }; 
+            document.getElementById("form").innerHTML = '<input type="text" id="id" value="'+id.value+'">\n<button onclick="openJSON()">Find an Element</button>\n<input type="text" id="name" value="'+data[id.value][0].name+'">\n<input type="number" id="cost" value="'+data[id.value][0].cost+'">\n<input type="text" id="img" value="'+data[id.value][0].img+'">\n<button onclick="updateJSON()">Update an Element</button>';
+        }
+
+        function updateJSON(){
+            let name = document.querySelector('#name');
+            let cost = document.querySelector('#cost');
+            let img = document.querySelector('#img');
+            let xhr = new XMLHttpRequest();
+            xhr.open("POST", "update.php", true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    data = JSON.parse(this.responseText).map(Object.values);
+                }
+            };
+            data[id.value][0].name = name.value;
+            data[id.value][0].cost = cost.value;
+            data[id.value][0].img = img.value;
+            let newData = JSON.stringify(data);
+            xhr.send(newData);
+        }
+
+        openJSON();
+    </script>
+</body>
+
+</html>
